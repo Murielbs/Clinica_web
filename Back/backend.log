@@ -1,0 +1,5 @@
+[dotenv@17.2.3] injecting env (2) from .env -- tip: 🛠️  run anywhere with `dotenvx run -- yourcommand`
+[dotenv@17.2.3] injecting env (1) from ../.env -- tip: ⚙️  suppress all logs with { quiet: true }
+[env] carregado DATABASE_URL a partir de /workspaces/Clinica_web/.env
+Server listening on http://localhost:3000
+[auth] login attempt for email: joao.almeida@hospital.com

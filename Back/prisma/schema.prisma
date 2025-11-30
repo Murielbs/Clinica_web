@@ -1,0 +1,121 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Paciente {
+  PacienteID               Int       @id @default(autoincrement())
+  NomeCompleto             String
+  DataNascimento           DateTime
+  CPF                      String    @unique
+  Telefone                 String?
+  Email                    String?
+  Endereco                 String?
+  EstadoCivil              String?
+  NomeContatoEmergencia    String?
+  TelefoneContatoEmergencia String?
+
+  Prontuarios              Prontuario[]
+
+  @@map("Paciente")
+}
+
+model Medico {
+  MedicoID    Int         @id @default(autoincrement())
+  NomeCompleto String
+  CRM         String      @unique
+  Email       String      @unique
+  Senha       String
+  Telefone    String?
+  Especialidade String?
+
+  Prontuarios Prontuario[] @relation("MedicoProntuarios")
+  Consultas   Consulta[]   @relation("MedicoConsultas")
+
+  @@map("Médico")
+}
+
+model Prontuario {
+  ProntuarioID            Int        @id @default(autoincrement())
+  PacienteID              Int
+  MedicoResponsavelID     Int
+  QueixaPrincipal         String
+  HistoricoQueixa         String?
+  HistoricoPessoalFamiliar String?
+  HistoricoMedico         String?
+  DataAbertura            DateTime   @default(now())
+  StatusProntuario        String     @default("Ativo")
+  DataEncerramento        DateTime?
+  MotivoEncerramento      String?
+  ResumoFinal             String?
+
+  paciente                Paciente   @relation(fields: [PacienteID], references: [PacienteID])
+  medico                  Medico     @relation("MedicoProntuarios", fields: [MedicoResponsavelID], references: [MedicoID])
+  consultas               Consulta[]
+  diagnosticos            Diagnostico[]
+  testes                  TesteAplicado[]
+  documentos              Documento[]
+
+  @@map("Prontuario")
+}
+
+model Consulta {
+  ConsultaID     Int       @id @default(autoincrement())
+  ProntuarioID   Int
+  MedicoID       Int
+  DataHoraInicio DateTime
+  DataHoraFim    DateTime?
+  TipoConsulta   String    @default("Individual")
+  ResumoConsulta String?
+  Observacoes    String?
+  IntervencoesUtilizadas String?
+  StatusConsulta String    @default("Realizada")
+
+  prontuario     Prontuario @relation(fields: [ProntuarioID], references: [ProntuarioID])
+  medico         Medico     @relation("MedicoConsultas", fields: [MedicoID], references: [MedicoID])
+
+  @@map("Consulta")
+}
+
+model Diagnostico {
+  DiagnosticoID Int      @id @default(autoincrement())
+  ProntuarioID  Int
+  DataDiagnostico DateTime
+  CodigoCID     String?
+  Descricao     String?
+  Observacoes   String?
+
+  prontuario    Prontuario @relation(fields: [ProntuarioID], references: [ProntuarioID])
+
+  @@map("Diagnostico")
+}
+
+model TesteAplicado {
+  TesteID       Int      @id @default(autoincrement())
+  ProntuarioID  Int
+  TipoTeste     String
+  DataAplicacao DateTime
+  Resultados    String?
+  LaudoInterpretativo String?
+
+  prontuario    Prontuario @relation(fields: [ProntuarioID], references: [ProntuarioID])
+
+  @@map("TesteAplicado")
+}
+
+model Documento {
+  DocumentoID Int      @id @default(autoincrement())
+  ProntuarioID Int
+  TipoDocumento String
+  Descricao   String?
+  DataEmissao DateTime
+  CaminhoArquivo String
+
+  prontuario  Prontuario @relation(fields: [ProntuarioID], references: [ProntuarioID])
+
+  @@map("Documento")
+}
